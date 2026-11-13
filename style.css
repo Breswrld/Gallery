@@ -64,11 +64,18 @@ html {
   flex: 0 0 100vw;
   width: 100vw;
   height: 100svh;
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: center;
   scroll-snap-align: start;
+}
+
+.gallery::-webkit-scrollbar {
+  display: none;
 }
 
 .tbanner {
@@ -275,6 +282,7 @@ html {
 }
 
 @media (min-width: 992px) {
+
   html {
     overflow: hidden;
     scroll-behavior: smooth;
@@ -503,21 +511,38 @@ html {
     width: 100vw;
     height: 100svh;
     overflow: hidden;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
     align-items: stretch;
     scroll-snap-align: start;
-    background: #fff;
+    background: #f6f6f7;
   }
 
   .computer__project-gallery {
+    position: relative;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
     gap: 10px;
     min-width: 0;
     min-height: 0;
     height: 100%;
-    padding: clamp(16px, 2.5vh, 24px) clamp(24px, 4vw, 56px);
-    background: #e8f2f8;
+    padding: clamp(16px, 2.5vh, 26px) clamp(28px, 4vw, 56px) clamp(16px, 2.5vh, 26px) clamp(20px, 3vw, 40px);
+    background: #f6f6f7;
+  }
+
+  .computer__project-gallery::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: url("images/dots.jpg") top center / 100% auto repeat-y;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 108px), rgba(0, 0, 0, 0.35) calc(100% - 44px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 108px), rgba(0, 0, 0, 0.35) calc(100% - 44px), transparent 100%);
+  }
+
+  .computer__project-gallery > * {
+    position: relative;
+    z-index: 1;
   }
 
   .computer__nav {
@@ -531,7 +556,7 @@ html {
   .computer__nav-steps {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 8px;
   }
 
   .computer__back,
@@ -539,14 +564,22 @@ html {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #075e9b;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #4169e1;
     font: 0.9rem Arial, sans-serif;
     text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .computer__back:hover,
-  .computer__step:hover {
-    text-decoration: underline;
+  .computer__back:focus-visible,
+  .computer__step:hover,
+  .computer__step:focus-visible {
+    background: #4169e1;
+    color: #ffffff;
+    text-decoration: none;
+    outline: none;
   }
 
   .computer__back svg,
@@ -568,12 +601,18 @@ html {
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    border: 1px solid #0879c9;
+    border: 1px solid #4169e1;
     border-radius: 4px;
-    background: transparent;
-    color: #075e9b;
+    background: rgba(255, 255, 255, 0.85);
+    color: #4169e1;
     font: 0.95rem Arial, sans-serif;
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .computer__upload:hover {
+    background: #4169e1;
+    color: #ffffff;
   }
 
   .computer__upload span {
@@ -590,7 +629,7 @@ html {
   }
 
   .computer__upload:focus-within {
-    outline: 2px solid #0879c9;
+    outline: 2px solid #4169e1;
     outline-offset: 3px;
   }
 
@@ -598,11 +637,13 @@ html {
     display: grid;
     min-height: 0;
     overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: clamp(76px, min(9.5vw, 15vh), 128px);
+    grid-auto-rows: clamp(120px, min(12.5vw, 24vh), 220px);
     grid-auto-flow: dense;
     align-content: start;
-    gap: 8px;
+    gap: 10px;
   }
 
   .computer__project-grid .project-media__item {
@@ -649,17 +690,17 @@ html {
   .computer__project-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 16px;
     min-width: 0;
     min-height: 0;
     overflow-y: auto;
-    padding: clamp(20px, 4vh, 36px) clamp(28px, 6vw, 96px);
+    padding: clamp(24px, 4vh, 44px) clamp(24px, 3.5vw, 56px);
   }
 
   .computer__project-title {
     width: 100%;
-    max-width: 16ch;
+    max-width: 20ch;
+    margin-top: auto;
     padding: 0;
     border: 0;
     border-bottom: 1px solid transparent;
@@ -671,19 +712,25 @@ html {
 
   .computer__project-description {
     width: 100%;
-    max-width: 48ch;
+    max-width: 62ch;
+    min-height: 8em;
     padding: 8px 0;
-    resize: vertical;
+    resize: none;
+    overflow: hidden;
     border: 0;
     border-bottom: 1px solid transparent;
     background: transparent;
-    color: #756a5d;
-    font: clamp(0.9rem, 1.8vh, 1rem)/1.5 Arial, sans-serif;
+    color: #575049;
+    font: clamp(0.95rem, 1.85vh, 1.06rem)/1.6 Arial, sans-serif;
+  }
+
+  .computer__project-content .project-media__actions {
+    margin-bottom: auto;
   }
 
   .computer__project-title:not([readonly]):focus,
   .computer__project-description:not([readonly]):focus {
-    border-bottom-color: #0879c9;
+    border-bottom-color: #4169e1;
     outline: none;
   }
 
@@ -691,6 +738,25 @@ html {
   .computer__project-description[readonly] {
     resize: none;
     outline: none;
+  }
+
+  .computer__project--computer .computer__project-gallery {
+    background: #0879c9;
+  }
+
+  .computer__project--computer .computer__back,
+  .computer__project--computer .computer__step,
+  .computer__project--computer .computer__upload {
+    border-color: #ffffff;
+    color: #ffffff;
+  }
+
+  .computer__project--computer .computer__upload:focus-within {
+    outline-color: #ffffff;
+  }
+
+  .computer__project--computer .computer__message {
+    color: #ffe3df;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1030,21 +1096,45 @@ html {
   flex: 0 0 100vw;
   width: 100vw;
   height: 100svh;
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: stretch;
   scroll-snap-align: start;
-  background: #fff;
+  background: #f6f6f7;
+}
+
+.project-media::-webkit-scrollbar {
+  display: none;
 }
 
 .project-media__gallery {
+  position: relative;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   align-content: stretch;
   gap: 12px;
   min-width: 0;
   padding: clamp(18px, 4vw, 48px);
-  background: #e8f2f8;
+  background: #f6f6f7;
+}
+
+.project-media__gallery::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("images/dots.jpg") top center / 100% auto repeat-y;
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 88px), rgba(0, 0, 0, 0.35) calc(100% - 36px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 88px), rgba(0, 0, 0, 0.35) calc(100% - 36px), transparent 100%);
+}
+
+.project-media__gallery > * {
+  position: relative;
+  z-index: 1;
 }
 
 .project-media__nav {
@@ -1058,7 +1148,7 @@ html {
 .project-media__nav-steps {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .project-media__back,
@@ -1066,14 +1156,22 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #075e9b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #4169e1;
   font: 0.9rem Arial, sans-serif;
   text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .project-media__back:hover,
-.project-media__step:hover {
-  text-decoration: underline;
+.project-media__back:focus-visible,
+.project-media__step:hover,
+.project-media__step:focus-visible {
+  background: #4169e1;
+  color: #ffffff;
+  text-decoration: none;
+  outline: none;
 }
 
 .project-media__back svg,
@@ -1095,13 +1193,18 @@ html {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border: 1px solid #0879c9;
+  border: 1px solid #4169e1;
   border-radius: 4px;
-  background: transparent;
-  color: #075e9b;
+  background: rgba(255, 255, 255, 0.85);
+  color: #4169e1;
   font-family: Arial, sans-serif;
-  font-size: 0.95rem;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.project-media__upload:hover {
+  background: #4169e1;
+  color: #ffffff;
 }
 
 .project-media__upload span {
@@ -1120,7 +1223,7 @@ html {
 }
 
 .project-media__upload:focus-within {
-  outline: 2px solid #0879c9;
+  outline: 2px solid #4169e1;
   outline-offset: 3px;
 }
 
@@ -1181,7 +1284,6 @@ html {
 .project-media__content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 18px;
   min-width: 0;
   padding: clamp(24px, 8vw, 112px);
@@ -1190,6 +1292,7 @@ html {
 .project-media__title {
   width: 100%;
   max-width: 16ch;
+  margin-top: auto;
   padding: 0;
   border: 0;
   border-bottom: 1px solid transparent;
@@ -1201,7 +1304,7 @@ html {
 
 .project-media__title:not([readonly]):focus,
 .project-media__description:not([readonly]):focus {
-  border-bottom-color: #0879c9;
+  border-bottom-color: #4169e1;
   outline: none;
 }
 
@@ -1213,13 +1316,15 @@ html {
 
 .project-media__description {
   width: 100%;
-  max-width: 48ch;
+  max-width: 56ch;
+  min-height: 6em;
   padding: 8px 0;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   border: 0;
   border-bottom: 1px solid transparent;
   background: transparent;
-  color: #756a5d;
+  color: #575049;
   font: 1rem/1.55 Arial, sans-serif;
 }
 
@@ -1230,18 +1335,23 @@ html {
   gap: 12px;
 }
 
+.project-media__content .project-media__actions {
+  margin-bottom: auto;
+}
+
 .project-media__save {
   padding: 8px 16px;
-  border: 1px solid #0879c9;
+  border: 1px solid #4169e1;
   border-radius: 999px;
-  background: transparent;
-  color: #075e9b;
+  background: rgba(255, 255, 255, 0.72);
+  color: #4169e1;
   font: 0.9rem Arial, sans-serif;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .project-media__save:hover {
-  background: #0879c9;
+  background: #4169e1;
   color: #fff;
 }
 
@@ -1252,8 +1362,31 @@ html {
 
 .project-media__save-status {
   margin: 0;
-  color: #756a5d;
+  color: #575049;
   font: 0.85rem Arial, sans-serif;
+}
+
+.computer-section__gallery {
+  background: #0879c9;
+}
+
+.computer-section__gallery .project-media__back,
+.computer-section__gallery .project-media__step,
+.computer-section__gallery .project-media__upload {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.computer-section__gallery .project-media__upload:focus-within {
+  outline-color: #ffffff;
+}
+
+.computer-section__gallery .project-media__message {
+  color: #ffe3df;
+}
+
+.computer-section__content {
+  background: #fff;
 }
 
 .lightbox {
@@ -1348,16 +1481,28 @@ html {
 @media (max-width: 680px) {
   .project-media {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(40vh, auto) auto;
+    grid-template-rows: auto auto;
+    align-content: start;
   }
 
   .project-media__gallery {
-    min-height: 40vh;
-    padding: 16px;
+    min-height: auto;
+    gap: 10px;
+    padding: 14px 16px 28px;
+  }
+
+  .project-media__gallery::before {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 56px), rgba(0, 0, 0, 0.35) calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 56px), rgba(0, 0, 0, 0.35) calc(100% - 22px), transparent 100%);
   }
 
   .project-media__grid {
-    grid-auto-rows: clamp(64px, 18vw, 92px);
+    min-height: 72px;
+    grid-auto-rows: clamp(60px, 16vw, 84px);
+  }
+
+  .project-media__message:empty {
+    display: none;
   }
 
   .project-media__item img {
@@ -1365,7 +1510,15 @@ html {
   }
 
   .project-media__content {
-    min-height: 38vh;
-    padding: 24px;
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: auto;
+    padding: 18px 18px 28px;
+  }
+
+  .project-media__title,
+  .project-media__content .project-media__actions {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }

@@ -1,4 +1,6 @@
-(() => {
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+document.addEventListener("DOMContentLoaded", () => {
   const contentsTable = "table_of_contents";
   const imagesTable = "project_images";
   const mediaBucket = "project-media";
@@ -36,9 +38,6 @@
   let currentUser = null;
   let closeAfterSignIn = false;
 
-  const { createClient } = window.supabase;
-  const supabase = createClient(supabaseUrl, supabasePublishableKey);
-
   function showStatus(message) {
     status.textContent = message;
     status.hidden = false;
@@ -51,10 +50,6 @@
     status.hidden = true;
     computerStatus.textContent = "";
     computerStatus.hidden = true;
-  }
-
-  function showError(message) {
-    error.textContent = message;
   }
 
   function createArrowIcon(direction) {
@@ -100,6 +95,12 @@
 
     nav.append(backLink, steps);
     return nav;
+  }
+
+  const supabase = createClient(supabaseUrl, supabasePublishableKey);
+
+  function showError(message) {
+    error.textContent = message;
   }
 
   function syncAuthUI() {
@@ -250,6 +251,20 @@
       : "";
   }
 
+  function autoSizeTextarea(textarea) {
+    if (!textarea || !textarea.isConnected) return;
+    textarea.style.height = "auto";
+    if (textarea.scrollHeight > 0) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }
+
+  function autoSizeAllDescriptions() {
+    for (const el of document.querySelectorAll(".computer__project-description, .project-media__description")) {
+      autoSizeTextarea(el);
+    }
+  }
+
   async function saveProjectText(entry, titleInput, descInput, saveBtn, saveStatusEl) {
     if (!currentUser) return;
     const nextTitle = titleInput.value.trim();
@@ -287,6 +302,7 @@
     }
     for (const el of document.querySelectorAll(`[data-project-id="${entry.id}"] [data-project-field="description"]`)) {
       el.value = nextDescription;
+      autoSizeTextarea(el);
     }
     for (const link of document.querySelectorAll(`[data-toc-link-id="${entry.id}"]`)) {
       link.textContent = nextTitle;
@@ -309,6 +325,7 @@
     gallery.className = isComputer ? "computer__project-gallery" : "project-media__gallery";
 
     const navBar = createNavBar(platform, prevHref, nextHref);
+
     const toolbar = document.createElement("div");
 
     const signInToAddBtn = document.createElement("button");
@@ -373,7 +390,7 @@
     description.className = isComputer ? "computer__project-description" : "project-media__description";
     description.value = entry.description ?? "Add a description for this project.";
     description.maxLength = 5000;
-    description.rows = 5;
+    description.rows = 1;
     description.readOnly = !currentUser;
     description.dataset.projectField = "description";
     description.setAttribute("aria-label", `${entry.title} section description`);
@@ -398,6 +415,9 @@
 
     for (const field of [title, description]) {
       field.addEventListener("input", () => {
+        if (field === description) {
+          autoSizeTextarea(description);
+        }
         if (currentUser) saveStatus.textContent = "Unsaved changes";
       });
       field.addEventListener("blur", () => {
@@ -546,6 +566,7 @@
     list.replaceChildren(phoneItems);
     computerList.replaceChildren(computerItems);
     syncAuthUI();
+    requestAnimationFrame(autoSizeAllDescriptions);
     return true;
   }
 
@@ -637,26 +658,17 @@
     }
   }
 
-  function closeLightbox() {
-    lightbox.close();
-    lightboxImage.classList.remove("is-zoomed");
-    lightboxImage.removeAttribute("src");
-    lightboxCaption.textContent = "";
-  }
+  const handleOpenTocEditor = () => openEditor(false);
+  const handleCancel = () => dialog.close();
 
-  editButton.addEventListener("click", () => openEditor(false));
-  computerEditButton.addEventListener("click", () => openEditor(false));
-  addRowButton.addEventListener("click", addEntryRow);
-  cancelButton.addEventListener("click", () => dialog.close());
-
-  signOutButton.addEventListener("click", async () => {
+  const handleSignOut = async () => {
     await supabase.auth.signOut();
     currentUser = null;
     syncAuthUI();
     dialog.close();
-  });
+  };
 
-  async function handleListClick(event) {
+  const handleListClick = async (event) => {
     const button = event.target?.closest("[data-remove-id]");
     if (!button || !currentUser) return;
     const id = button.dataset.removeId;
@@ -702,12 +714,9 @@
     }
 
     await renderEntries();
-  }
+  };
 
-  list.addEventListener("click", handleListClick);
-  computerList.addEventListener("click", handleListClick);
-
-  form.addEventListener("submit", async (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
     error.textContent = "";
 
@@ -766,19 +775,26 @@
     if (await renderEntries()) {
       dialog.close();
     }
-  });
+  };
 
-  lightboxClose.addEventListener("click", closeLightbox);
-  lightboxImage.addEventListener("click", () => {
+  const closeLightbox = () => {
+    lightbox.close();
+    lightboxImage.classList.remove("is-zoomed");
+    lightboxImage.removeAttribute("src");
+    lightboxCaption.textContent = "";
+  };
+
+  const handleLightboxImageClick = () => {
     lightboxImage.classList.toggle("is-zoomed");
-  });
-  lightbox.addEventListener("click", (event) => {
+  };
+
+  const handleLightboxBackdropClick = (event) => {
     if (event.target === lightbox) {
       closeLightbox();
     }
-  });
+  };
 
-  window.addEventListener("keydown", (event) => {
+  const handleKeyDown = (event) => {
     if (dialog.open || lightbox.open) return;
     const activeTag = document.activeElement?.tagName;
     if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
@@ -790,7 +806,21 @@
 
     const delta = event.key === "ArrowRight" ? window.innerWidth : -window.innerWidth;
     scroller.scrollBy({ left: delta, behavior: "smooth" });
-  });
+  };
+
+  editButton.addEventListener("click", handleOpenTocEditor);
+  computerEditButton.addEventListener("click", handleOpenTocEditor);
+  addRowButton.addEventListener("click", addEntryRow);
+  cancelButton.addEventListener("click", handleCancel);
+  signOutButton.addEventListener("click", handleSignOut);
+  list.addEventListener("click", handleListClick);
+  computerList.addEventListener("click", handleListClick);
+  form.addEventListener("submit", handleFormSubmit);
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightboxImage.addEventListener("click", handleLightboxImageClick);
+  lightbox.addEventListener("click", handleLightboxBackdropClick);
+  window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener("resize", autoSizeAllDescriptions);
 
   supabase.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user ?? null;
@@ -810,4 +840,4 @@
   initialize().catch((err) => {
     showStatus(`Could not connect to Supabase: ${err instanceof Error ? err.message : String(err)}`);
   });
-})();
+});
