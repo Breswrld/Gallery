@@ -9,6 +9,22 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 body {
   min-width: 320px;
   min-height: 100svh;
@@ -25,15 +41,7 @@ html {
   width: 100vw;
   height: 100vh;
   height: 100svh;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-}
-
-.horizontal-sections::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
 
 .phone {
@@ -41,7 +49,7 @@ html {
   flex: 0 0 100vw;
   width: 100vw;
   height: 100svh;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   scroll-behavior: smooth;
@@ -52,17 +60,11 @@ html {
   display: none;
 }
 
-@media (min-width: 681px) {
-  .phone {
-    display: none;
-  }
-}
-
 .gallery {
   flex: 0 0 100vw;
   width: 100vw;
-  min-height: 100vh;
-  min-height: 100svh;
+  height: 100svh;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: center;
@@ -78,7 +80,6 @@ html {
   width: calc(100% + 72px);
   margin-left: -72px;
   height: 100%;
-  min-height: 100vh;
   min-height: 100svh;
   background: transparent;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 72px);
@@ -218,6 +219,7 @@ html {
   stroke-linejoin: round;
   stroke-width: 1.5;
 }
+
 @media (max-width: 680px) {
   .gallery {
     grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
@@ -237,7 +239,6 @@ html {
   .intro__title {
     font-size: clamp(1.35rem, 6vw, 1.65rem);
     line-height: 1.02;
-    transform: translateY(-18px);
   }
 
   .intro_p {
@@ -302,7 +303,7 @@ html {
     display: flex;
     width: 100vw;
     height: 100svh;
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
     scroll-behavior: smooth;
@@ -347,6 +348,7 @@ html {
     display: grid;
     width: 100vw;
     height: 100svh;
+    overflow-y: auto;
     grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
     align-items: center;
     gap: clamp(32px, 7vw, 100px);
@@ -423,6 +425,7 @@ html {
     display: grid;
     width: 100vw;
     height: 100svh;
+    overflow-y: auto;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
     scroll-snap-align: start;
@@ -431,11 +434,51 @@ html {
 
   .computer__project-gallery {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
     gap: 12px;
     min-width: 0;
     padding: 24px clamp(24px, 5vw, 64px);
     background: #e8f2f8;
+  }
+
+  .computer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .computer__nav-steps {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .computer__back,
+  .computer__step {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #075e9b;
+    font: 0.9rem Arial, sans-serif;
+    text-decoration: none;
+  }
+
+  .computer__back:hover,
+  .computer__step:hover {
+    text-decoration: underline;
+  }
+
+  .computer__back svg,
+  .computer__step svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
   }
 
   .computer__upload {
@@ -448,6 +491,7 @@ html {
     padding: 8px 14px;
     border: 1px solid #0879c9;
     border-radius: 4px;
+    background: transparent;
     color: #075e9b;
     font: 1rem Arial, sans-serif;
     cursor: pointer;
@@ -474,23 +518,32 @@ html {
   .computer__project-grid {
     display: grid;
     min-height: 220px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: minmax(120px, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(92px, 11vw, 140px);
+    grid-auto-flow: dense;
     align-content: start;
     gap: 8px;
   }
 
   .computer__project-grid .project-media__item {
     min-width: 0;
+    height: 100%;
+    overflow: hidden;
     border-color: #b7cbd7;
+  }
+
+  .computer__project-grid .project-media__item:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
   }
 
   .computer__project-grid .project-media__item img {
     display: block;
     width: 100%;
     height: 100%;
-    min-height: 120px;
+    min-height: 0;
     object-fit: cover;
+    cursor: zoom-in;
   }
 
   .computer__project-grid .project-media__item button {
@@ -546,14 +599,16 @@ html {
     font: 1rem/1.55 Arial, sans-serif;
   }
 
-  .computer__project-title:focus,
-  .computer__project-description:focus {
+  .computer__project-title:not([readonly]):focus,
+  .computer__project-description:not([readonly]):focus {
     border-bottom-color: #0879c9;
     outline: none;
   }
 
-  .computer__project--computer .computer__project-gallery {
-    background: #0879c9;
+  .computer__project-title[readonly],
+  .computer__project-description[readonly] {
+    resize: none;
+    outline: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -572,11 +627,13 @@ html {
   position: relative;
   flex: 0 0 100vw;
   width: 100vw;
-  min-height: 100vh;
-  min-height: 100svh;
-  display: grid;
-  place-items: start center;
-  padding: clamp(32px, 8vw, 112px);
+  height: 100svh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: clamp(24px, 5vw, 48px) clamp(24px, 6vw, 112px) 48px;
   scroll-snap-align: start;
   background: #f7f3eb;
 }
@@ -628,16 +685,17 @@ html {
 }
 
 @media (max-width: 680px) {
-  .contents__inner {
-    transform: translateY(64px);
+  .contents {
+    gap: 20px;
+    padding: 20px 20px 40px;
   }
 
   .contents__inner h2 {
-    font-size: clamp(1.1rem, 5.2vw, 1.5rem);
+    font-size: clamp(1.25rem, 5.2vw, 1.5rem);
   }
 
   .contents__table {
-    font-size: clamp(0.65rem, 2.7vw, 0.78rem);
+    font-size: clamp(0.8rem, 3.2vw, 0.95rem);
   }
 }
 
@@ -687,9 +745,8 @@ html {
 }
 
 .contents__back {
-  position: absolute;
-  top: 28px;
-  left: 28px;
+  align-self: flex-start;
+  flex-shrink: 0;
   display: grid;
   width: 52px;
   height: 52px;
@@ -800,14 +857,6 @@ html {
   background: #e9e1d5;
 }
 
-.editor__remove[hidden] {
-  display: none;
-}
-
-.editor__entry[hidden] {
-  display: none;
-}
-
 .editor__error {
   color: #9c3025 !important;
 }
@@ -820,12 +869,9 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .horizontal-sections {
-    scroll-behavior: auto;
-    scroll-snap-type: none;
-  }
-
-  .phone {
+  .horizontal-sections,
+  .phone,
+  .computer {
     scroll-behavior: auto;
     scroll-snap-type: none;
   }
@@ -863,8 +909,8 @@ html {
   display: grid;
   flex: 0 0 100vw;
   width: 100vw;
-  min-height: 100vh;
-  min-height: 100svh;
+  height: 100svh;
+  overflow-y: auto;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: stretch;
   scroll-snap-align: start;
@@ -873,12 +919,52 @@ html {
 
 .project-media__gallery {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
   align-content: stretch;
   gap: 12px;
   min-width: 0;
   padding: clamp(18px, 4vw, 48px);
   background: #e8f2f8;
+}
+
+.project-media__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.project-media__nav-steps {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-media__back,
+.project-media__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #075e9b;
+  font: 0.9rem Arial, sans-serif;
+  text-decoration: none;
+}
+
+.project-media__back:hover,
+.project-media__step:hover {
+  text-decoration: underline;
+}
+
+.project-media__back svg,
+.project-media__step svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
 }
 
 .project-media__upload {
@@ -891,6 +977,7 @@ html {
   padding: 8px 14px;
   border: 1px solid #0879c9;
   border-radius: 4px;
+  background: transparent;
   color: #075e9b;
   font-family: Arial, sans-serif;
   cursor: pointer;
@@ -919,8 +1006,9 @@ html {
 .project-media__grid {
   display: grid;
   min-height: 180px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(100px, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: clamp(68px, 16vw, 108px);
+  grid-auto-flow: dense;
   align-content: start;
   gap: 8px;
 }
@@ -928,17 +1016,25 @@ html {
 .project-media__item {
   position: relative;
   min-width: 0;
+  height: 100%;
+  overflow: hidden;
   margin: 0;
   border: 1px solid #b7cbd7;
   background: #fff;
+}
+
+.project-media__item:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 
 .project-media__item img {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 100px;
+  min-height: 0;
   object-fit: cover;
+  cursor: zoom-in;
 }
 
 .project-media__item button {
@@ -982,9 +1078,15 @@ html {
   letter-spacing: -0.045em;
 }
 
-.project-media__title:focus,
-.project-media__description:focus {
+.project-media__title:not([readonly]):focus,
+.project-media__description:not([readonly]):focus {
   border-bottom-color: #0879c9;
+  outline: none;
+}
+
+.project-media__title[readonly],
+.project-media__description[readonly] {
+  resize: none;
   outline: none;
 }
 
@@ -1000,18 +1102,131 @@ html {
   font: 1rem/1.55 Arial, sans-serif;
 }
 
-.computer-section__gallery {
-  background: #0879c9;
+.project-media__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
 }
 
-.computer-section__content {
+.project-media__save {
+  padding: 8px 16px;
+  border: 1px solid #0879c9;
+  border-radius: 999px;
+  background: transparent;
+  color: #075e9b;
+  font: 0.9rem Arial, sans-serif;
+  cursor: pointer;
+}
+
+.project-media__save:hover {
+  background: #0879c9;
+  color: #fff;
+}
+
+.project-media__save:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.project-media__save-status {
+  margin: 0;
+  color: #756a5d;
+  font: 0.85rem Arial, sans-serif;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  max-width: 96vw;
+  max-height: 96svh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: visible;
+}
+
+.lightbox::backdrop {
+  background: rgba(20, 17, 13, 0.86);
+}
+
+.lightbox__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  max-width: 94vw;
+  max-height: 92svh;
+  padding: 48px 16px 16px;
+}
+
+.lightbox__close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(20, 17, 13, 0.78);
+  color: #fff;
+  font: 1.6rem/1 Arial, sans-serif;
+  cursor: pointer;
+}
+
+.lightbox__close:hover {
   background: #fff;
+  color: #342d25;
+}
+
+.lightbox__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.lightbox__viewport {
+  max-width: 90vw;
+  max-height: 82svh;
+  overflow: auto;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+}
+
+.lightbox__image {
+  display: block;
+  max-width: 88vw;
+  max-height: 80svh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  cursor: zoom-in;
+}
+
+.lightbox__image.is-zoomed {
+  max-width: none;
+  max-height: none;
+  width: min(165vw, 1800px);
+  cursor: zoom-out;
+}
+
+.lightbox__caption {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font: 0.85rem Arial, sans-serif;
+  text-align: center;
 }
 
 @media (max-width: 680px) {
   .project-media {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(40vh, 1fr) auto;
+    grid-template-rows: minmax(40vh, auto) auto;
   }
 
   .project-media__gallery {
@@ -1020,11 +1235,11 @@ html {
   }
 
   .project-media__grid {
-    grid-auto-rows: minmax(74px, 1fr);
+    grid-auto-rows: clamp(64px, 18vw, 92px);
   }
 
   .project-media__item img {
-    min-height: 74px;
+    min-height: 0;
   }
 
   .project-media__content {

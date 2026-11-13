@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gallery</title>
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=18">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=15" defer></script>
+  <script src="script.js?v=18" defer></script>
 </head>
 <body>
   <main class="horizontal-sections">
@@ -37,13 +37,12 @@
           <h2 id="contents-title">Table of Contents</h2>
           <table class="contents__table">
             <thead>
-              <tr><th scope="col">Title</th></tr>
-            </thead>
-            <tbody id="contents-list">
-              <tr class="contents__computer-row">
-                <td><a href="#phone-computer-section">Computer</a></td>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
               </tr>
-            </tbody>
+            </thead>
+            <tbody id="contents-list"></tbody>
           </table>
           <p class="contents__status" id="contents-status" role="status" aria-live="polite" hidden></p>
           <button class="contents__edit" id="contents-edit" type="button">
@@ -51,21 +50,8 @@
           </button>
         </div>
       </section>
+
       <div id="dynamic-sections"></div>
-      <section class="project-media computer-section" id="phone-computer-section" aria-labelledby="phone-computer-title">
-        <div class="project-media__gallery computer-section__gallery">
-          <label class="project-media__upload computer-section__upload">
-            <span aria-hidden="true">+</span> Add computer media
-            <input type="file" accept="image/*" multiple aria-label="Upload computer media">
-          </label>
-          <div class="project-media__grid" id="phone-computer-gallery"></div>
-          <p class="project-media__message" id="phone-computer-upload-status" role="status"></p>
-        </div>
-        <div class="project-media__content computer-section__content">
-          <input class="project-media__title" id="phone-computer-title" type="text" value="Computer" maxlength="120" aria-label="Computer section title">
-          <textarea class="project-media__description" rows="5" maxlength="5000" aria-label="Computer section description">Upload and organize computer-based media here.</textarea>
-        </div>
-      </section>
     </section>
 
     <section class="computer" id="computer-view" aria-label="Computer gallery">
@@ -80,32 +66,22 @@
           <p>For this project, I focused on pushing the limits of digital collage and image manipulation in Photoshop by carefully integrating custom elements, precise masking, and advanced blending techniques. My goal was to create a seamless, cohesive composition that transforms the original source material into something entirely new, paying close attention to lighting, scale, and texture to ensure the illusion remains completely believable.</p>
         </div>
         <nav class="computer__contents" aria-labelledby="computer-contents-title">
-          
+          <h2 id="computer-contents-title">Table of Contents</h2>
           <table>
-            <thead><tr><th scope="col">Title</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
-            <tbody id="computer-contents-list">
-              <tr class="computer__computer-row"><td><a href="#computer-media-section"></a></td><td></td></tr>
-            </tbody>
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="computer-contents-list"></tbody>
           </table>
           <p class="contents__status" id="computer-contents-status" role="status" aria-live="polite" hidden></p>
           <button class="contents__edit" id="computer-contents-edit" type="button">+ Add title</button>
         </nav>
       </section>
+
       <div id="computer-dynamic-sections"></div>
-      <section class="computer__project computer__project--computer" id="computer-media-section" aria-labelledby="computer-media-title">
-        <div class="computer__project-gallery">
-          <label class="computer__upload">
-            <span aria-hidden="true">+</span> Add computer media
-            <input type="file" accept="image/*" multiple aria-label="Upload computer media">
-          </label>
-          <div class="computer__project-grid" id="computer-media-gallery"></div>
-          <p class="computer__message" id="computer-media-upload-status" role="status"></p>
-        </div>
-        <div class="computer__project-content">
-          <input class="computer__project-title" id="computer-media-title" type="text" value="Computer" maxlength="120" aria-label="Computer section title">
-          <textarea class="computer__project-description" rows="5" maxlength="5000" aria-label="Computer section description">Upload and organize computer-based media here.</textarea>
-        </div>
-      </section>
     </section>
 
     <dialog class="editor" id="contents-dialog" aria-labelledby="editor-title">
@@ -122,10 +98,21 @@
         </div>
         <p class="editor__error" id="editor-error" role="alert"></p>
         <div class="editor__actions">
+          <button type="button" class="editor__cancel" id="editor-signout" hidden>Sign out</button>
           <button type="button" class="editor__cancel" id="editor-cancel">Cancel</button>
           <button type="submit" class="contents__edit" id="editor-submit">Continue</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog class="lightbox" id="photo-lightbox" aria-label="Enlarged photo view">
+      <button type="button" class="lightbox__close" id="lightbox-close" aria-label="Close enlarged photo">&times;</button>
+      <div class="lightbox__frame">
+        <div class="lightbox__viewport">
+          <img class="lightbox__image" id="lightbox-image" alt="">
+        </div>
+        <p class="lightbox__caption" id="lightbox-caption"></p>
+      </div>
     </dialog>
   </main>
 </body>
