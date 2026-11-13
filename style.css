@@ -275,10 +275,6 @@ html {
 }
 
 @media (min-width: 992px) {
-  :root {
-    --computer-banner-height: clamp(82px, 13vh, 128px);
-  }
-
   html {
     overflow: hidden;
     scroll-behavior: smooth;
@@ -316,68 +312,6 @@ html {
     display: none;
   }
 
-  .computer__banner {
-    position: absolute;
-    z-index: 20;
-    inset: 0 0 auto;
-    height: var(--computer-banner-height);
-    overflow: hidden;
-    background: #fff;
-  }
-
-  .computer__banner img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .computer__banner .computer__banner-top {
-    z-index: 1;
-    -webkit-mask-image: linear-gradient(to right, #000 0 45%, transparent 55% 100%);
-    -webkit-mask-position: 0 0;
-    -webkit-mask-size: 250% 100%;
-    mask-image: linear-gradient(to right, #000 0 45%, transparent 55% 100%);
-    mask-position: 0 0;
-    mask-size: 250% 100%;
-    animation: computer-banner-wipe 16s linear infinite;
-  }
-
-  @keyframes computer-banner-wipe {
-    0% {
-      -webkit-mask-position: 0 0;
-      mask-position: 0 0;
-    }
-    18.75%, 81.25% {
-      -webkit-mask-position: 100% 0;
-      mask-position: 100% 0;
-    }
-    100% {
-      -webkit-mask-position: 0 0;
-      mask-position: 0 0;
-    }
-  }
-
-  @supports not (mask-image: linear-gradient(to right, #000, transparent)) {
-    .computer__banner .computer__banner-top {
-      clip-path: inset(0);
-      animation-name: computer-banner-clip-wipe;
-    }
-
-    @keyframes computer-banner-clip-wipe {
-      0% {
-        clip-path: inset(0);
-      }
-      18.75%, 81.25% {
-        clip-path: inset(0 0 0 100%);
-      }
-      100% {
-        clip-path: inset(0);
-      }
-    }
-  }
-
   .computer__home {
     position: relative;
     flex: 0 0 100vw;
@@ -385,24 +319,33 @@ html {
     width: 100vw;
     height: 100svh;
     overflow: hidden;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
-    align-items: center;
-    gap: clamp(24px, 5vw, 80px);
-    padding: calc(var(--computer-banner-height) + clamp(16px, 2.5vh, 28px)) clamp(32px, 6vw, 96px) clamp(16px, 3vh, 32px);
+    grid-template-columns: minmax(0, 0.9fr) minmax(440px, 1.1fr);
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
     scroll-snap-align: start;
+  }
+
+  .computer__intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: clamp(32px, 5vh, 64px) clamp(32px, 5vw, 72px);
+    background: #fff;
   }
 
   .computer__intro h1 {
     max-width: 16ch;
     margin: 0;
-    font-size: clamp(1.85rem, min(3.6vw, 5.4vh), 3.4rem);
+    font-size: clamp(2rem, min(3.6vw, 5.4vh), 3.5rem);
     font-weight: 400;
     line-height: 0.98;
     letter-spacing: -0.045em;
   }
 
   .computer__eyebrow {
-    margin: 0 0 clamp(8px, 1.4vh, 14px);
+    margin: 0 0 clamp(10px, 1.5vh, 14px);
     color: #0879c9;
     font: 0.8rem Arial, sans-serif;
     letter-spacing: 0.14em;
@@ -411,20 +354,96 @@ html {
 
   .computer__intro > p:last-child {
     max-width: 55ch;
-    margin: clamp(12px, 2vh, 20px) 0 0;
+    margin: clamp(14px, 2vh, 22px) 0 0;
     color: #756a5d;
-    font: clamp(0.88rem, min(1.2vw, 2vh), 1rem)/1.5 Arial, sans-serif;
+    font: clamp(0.88rem, min(1.15vw, 2vh), 1rem)/1.55 Arial, sans-serif;
+  }
+
+  .computer__contents-bg {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    padding: clamp(24px, 4.5vh, 48px) clamp(24px, 4vw, 56px) clamp(24px, 4.5vh, 48px) clamp(44px, 6vw, 84px);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .computer__contents-bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.35) 56px, #000 132px);
+    mask-image: linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.35) 56px, #000 132px);
   }
 
   .computer__contents {
-    width: 100%;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 540px);
     max-height: 100%;
+    overflow: hidden;
+    padding: clamp(22px, 3.2vh, 34px) clamp(22px, 3vw, 34px);
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 22px;
+    background: rgba(252, 249, 243, 0.72);
+    color: #262018;
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 22px 52px rgba(14, 28, 34, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .computer__contents-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .computer__contents-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .computer__contents-scroll {
+      padding-right: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(52, 45, 37, 0.35) transparent;
+      -ms-overflow-style: auto;
+    }
+
+    .computer__contents-scroll::-webkit-scrollbar {
+      display: block;
+      width: 6px;
+    }
+
+    .computer__contents-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .computer__contents-scroll::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background-color: rgba(52, 45, 37, 0.3);
+    }
+
+    .computer__contents-scroll::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(52, 45, 37, 0.55);
+    }
   }
 
   .computer__contents h2 {
-    margin: 0 0 clamp(12px, 2vh, 20px);
-    font-size: clamp(1.45rem, min(2.6vw, 3.8vh), 2.25rem);
+    flex-shrink: 0;
+    margin: 0 0 clamp(12px, 2vh, 18px);
+    font-size: clamp(1.45rem, min(2.6vw, 3.8vh), 2.2rem);
     font-weight: 400;
   }
 
@@ -436,23 +455,42 @@ html {
 
   .computer__contents th,
   .computer__contents td {
-    padding: clamp(7px, 1.1vh, 11px) 10px;
-    border: 1px solid #342d25;
+    padding: clamp(8px, 1.2vh, 12px) 4px;
+    border: 0;
+    border-bottom: 1px solid rgba(52, 45, 37, 0.18);
   }
 
   .computer__contents th {
+    color: #5a5045;
+    font-size: 0.92rem;
     font-weight: 400;
+  }
+
+  .computer__contents tbody tr:last-child td {
+    border-bottom: 0;
   }
 
   .computer__contents a {
     color: inherit;
-    text-decoration-color: #b7aa96;
+    text-decoration-color: rgba(52, 45, 37, 0.45);
     text-underline-offset: 4px;
   }
 
+  .computer__contents a:hover {
+    text-decoration-color: currentColor;
+  }
+
   .computer__contents > .contents__edit {
-    margin-top: clamp(12px, 2vh, 18px);
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: clamp(14px, 2.2vh, 20px);
     padding: 9px 18px;
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  .computer__contents > .contents__edit:hover {
+    background: #342d25;
+    color: #f7f3eb;
   }
 
   #computer-dynamic-sections {
@@ -659,11 +697,6 @@ html {
     html {
       scroll-behavior: auto;
     }
-
-    .computer__banner .computer__banner-top {
-      animation: none;
-      opacity: 0;
-    }
   }
 }
 
@@ -673,6 +706,8 @@ html {
   width: 100vw;
   height: 100svh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -680,6 +715,39 @@ html {
   padding: clamp(24px, 5vw, 48px) clamp(24px, 6vw, 112px) 48px;
   scroll-snap-align: start;
   background: #f7f3eb;
+}
+
+.contents::-webkit-scrollbar {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contents {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(52, 45, 37, 0.35) transparent;
+    -ms-overflow-style: auto;
+  }
+
+  .contents::-webkit-scrollbar {
+    display: block;
+    width: 10px;
+  }
+
+  .contents::-webkit-scrollbar-track {
+    margin-block: 12px;
+    background: transparent;
+  }
+
+  .contents::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+    background-color: rgba(52, 45, 37, 0.32);
+  }
+
+  .contents::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(52, 45, 37, 0.55);
+  }
 }
 
 .contents__inner {

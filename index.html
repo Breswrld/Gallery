@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Digital Imaging II Gallery</title>
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=21">
   <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
   <link rel="shortcut icon" href="favicon/favicon.ico" />
@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Gallery" />
   <link rel="manifest" href="favicon/site.webmanifest" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=20" defer></script>
+  <script src="script.js?v=21" defer></script>
 </head>
 <body>
   <main class="horizontal-sections">
@@ -61,28 +61,29 @@
 
     <section class="computer" id="computer-view" aria-label="Computer gallery">
       <section class="computer__home" id="computer-home">
-        <header class="computer__banner" aria-label="Gallery banner">
-          <img src="images/cpsidewall.jpg" alt="">
-          <img class="computer__banner-top" src="images/cpsidewall2.jpg" alt="">
-        </header>
         <div class="computer__intro">
           <p class="computer__eyebrow">Digital portfolio</p>
           <h1>Welcome to Digital Imaging II: Adobe Photoshop</h1>
           <p>For this project, I focused on pushing the limits of digital collage and image manipulation in Photoshop by carefully integrating custom elements, precise masking, and advanced blending techniques. My goal was to create a seamless, cohesive composition that transforms the original source material into something entirely new, paying close attention to lighting, scale, and texture to ensure the illusion remains completely believable.</p>
         </div>
-        <nav class="computer__contents" aria-labelledby="computer-contents-title">
-          <h2 id="computer-contents-title">Table of Contents</h2>
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Title</th>
-              </tr>
-            </thead>
-            <tbody id="computer-contents-list"></tbody>
-          </table>
-          <p class="contents__status" id="computer-contents-status" role="status" aria-live="polite" hidden></p>
-          <button class="contents__edit" id="computer-contents-edit" type="button">+ Add title</button>
-        </nav>
+        <div class="computer__contents-bg">
+          <img class="computer__contents-bg-image" src="images/toc-bg.jpg" alt="" aria-hidden="true">
+          <nav class="computer__contents" aria-labelledby="computer-contents-title">
+            <h2 id="computer-contents-title">Table of Contents</h2>
+            <div class="computer__contents-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Title</th>
+                  </tr>
+                </thead>
+                <tbody id="computer-contents-list"></tbody>
+              </table>
+            </div>
+            <p class="contents__status" id="computer-contents-status" role="status" aria-live="polite" hidden></p>
+            <button class="contents__edit" id="computer-contents-edit" type="button">+ Add title</button>
+          </nav>
+        </div>
       </section>
 
       <div id="computer-dynamic-sections"></div>
