@@ -9,6 +9,7 @@ alter table public.table_of_contents enable row level security;
 
 grant select on public.table_of_contents to anon, authenticated;
 grant insert on public.table_of_contents to authenticated;
+grant delete on public.table_of_contents to authenticated;
 
 drop policy if exists "Anyone can read table of contents" on public.table_of_contents;
 create policy "Anyone can read table of contents"
@@ -23,6 +24,15 @@ create policy "Configured editor can add table of contents entries"
   for insert
   to authenticated
   with check (
+    lower(auth.jwt() ->> 'email') = lower('REPLACE_WITH_EDITOR_EMAIL')
+  );
+
+drop policy if exists "Configured editor can remove table of contents entries" on public.table_of_contents;
+create policy "Configured editor can remove table of contents entries"
+  on public.table_of_contents
+  for delete
+  to authenticated
+  using (
     lower(auth.jwt() ->> 'email') = lower('REPLACE_WITH_EDITOR_EMAIL')
   );
 
