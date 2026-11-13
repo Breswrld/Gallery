@@ -754,6 +754,7 @@ document.addEventListener("DOMContentLoaded", () => {
         titleInput.focus();
         return;
       }
+      // Kept href: "" since your table has an href column
       newEntries.push({
         title,
         href: "",
