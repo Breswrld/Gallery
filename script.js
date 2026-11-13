@@ -26,6 +26,8 @@
   const passwordLabel = form.querySelector('label[for="editor-password"]');
   const dynamicSections = document.getElementById("dynamic-sections");
   const computerDynamicSections = document.getElementById("computer-dynamic-sections");
+  const addRowButton = document.getElementById("editor-add");
+  const cancelButton = document.getElementById("editor-cancel");
   const lightbox = document.getElementById("photo-lightbox");
   const lightboxImage = document.getElementById("lightbox-image");
   const lightboxCaption = document.getElementById("lightbox-caption");
@@ -33,6 +35,9 @@
 
   let currentUser = null;
   let closeAfterSignIn = false;
+
+  const { createClient } = window.supabase;
+  const supabase = createClient(supabaseUrl, supabasePublishableKey);
 
   function showStatus(message) {
     status.textContent = message;
@@ -46,6 +51,10 @@
     status.hidden = true;
     computerStatus.textContent = "";
     computerStatus.hidden = true;
+  }
+
+  function showError(message) {
+    error.textContent = message;
   }
 
   function createArrowIcon(direction) {
@@ -93,17 +102,6 @@
     return nav;
   }
 
-  if (!window.supabase) {
-    showStatus("Could not load the Supabase client.");
-    return;
-  }
-
-  const supabase = window.supabase.createClient(supabaseUrl, supabasePublishableKey);
-
-  function showError(message) {
-    error.textContent = message;
-  }
-
   function syncAuthUI() {
     const isEditor = Boolean(currentUser);
     signOutButton.hidden = !isEditor;
@@ -136,6 +134,7 @@
     const image = document.createElement("img");
     image.src = imgRecord.url;
     image.alt = imgRecord.file_name || "Project photo";
+    image.referrerPolicy = "no-referrer";
     image.tabIndex = 0;
     image.setAttribute("role", "button");
     image.setAttribute("aria-label", `Zoom in on ${imgRecord.file_name || "photo"}`);
@@ -349,7 +348,7 @@
     message.setAttribute("role", "status");
 
     fileInput.addEventListener("change", async () => {
-      const files = [...fileInput.files];
+      const files = [...(fileInput.files ?? [])];
       fileInput.value = "";
       if (files.length) {
         await handlePhotoUpload(files, entry, message);
@@ -432,7 +431,7 @@
           .order("id", { ascending: true })
       ]);
     } catch (err) {
-      showStatus(`Could not load the table of contents: ${err.message}`);
+      showStatus(`Could not load the table of contents: ${err instanceof Error ? err.message : String(err)}`);
       return false;
     }
 
@@ -516,13 +515,14 @@
       ]) {
         const row = document.createElement("tr");
         const titleCell = document.createElement("td");
+        const rowContent = document.createElement("div");
+        rowContent.className = "contents__row";
+
         const link = document.createElement("a");
         link.href = `#${sectionId}`;
         link.dataset.tocLinkId = String(entry.id);
         link.textContent = entry.title;
-        titleCell.append(link);
 
-        const actionsCell = document.createElement("td");
         const removeButton = document.createElement("button");
         removeButton.type = "button";
         removeButton.className = "contents__remove";
@@ -530,9 +530,10 @@
         removeButton.textContent = "Remove";
         removeButton.hidden = !currentUser;
         removeButton.setAttribute("aria-label", `Remove ${entry.title} from the table of contents`);
-        actionsCell.append(removeButton);
 
-        row.append(titleCell, actionsCell);
+        rowContent.append(link, removeButton);
+        titleCell.append(rowContent);
+        row.append(titleCell);
         items.append(row);
       }
 
@@ -546,6 +547,14 @@
     computerList.replaceChildren(computerItems);
     syncAuthUI();
     return true;
+  }
+
+  function updateRemoveButtons() {
+    const rows = entryList.querySelectorAll(".editor__entry-row");
+    for (const row of rows) {
+      const removeBtn = row.querySelector(".editor__remove");
+      if (removeBtn) removeBtn.hidden = rows.length === 1;
+    }
   }
 
   function addEntryRow() {
@@ -574,13 +583,6 @@
     entryList.append(row);
     updateRemoveButtons();
     titleInput.focus();
-  }
-
-  function updateRemoveButtons() {
-    const rows = entryList.querySelectorAll(".editor__entry-row");
-    for (const row of rows) {
-      row.querySelector(".editor__remove").hidden = rows.length === 1;
-    }
   }
 
   function resetEntryRows() {
@@ -629,23 +631,11 @@
     }
     dialog.showModal();
     if (currentUser) {
-      entryList.querySelector('[data-field="title"]').focus();
+      entryList.querySelector('[data-field="title"]')?.focus();
     } else {
       emailInput.focus();
     }
   }
-
-  editButton.addEventListener("click", () => openEditor(false));
-  computerEditButton.addEventListener("click", () => openEditor(false));
-  document.getElementById("editor-add").addEventListener("click", addEntryRow);
-  document.getElementById("editor-cancel").addEventListener("click", () => dialog.close());
-
-  signOutButton.addEventListener("click", async () => {
-    await supabase.auth.signOut();
-    currentUser = null;
-    syncAuthUI();
-    dialog.close();
-  });
 
   function closeLightbox() {
     lightbox.close();
@@ -654,62 +644,68 @@
     lightboxCaption.textContent = "";
   }
 
-  lightboxClose.addEventListener("click", closeLightbox);
-  lightboxImage.addEventListener("click", () => {
-    lightboxImage.classList.toggle("is-zoomed");
-  });
-  lightbox.addEventListener("click", (event) => {
-    if (event.target === lightbox) closeLightbox();
-  });
+  editButton.addEventListener("click", () => openEditor(false));
+  computerEditButton.addEventListener("click", () => openEditor(false));
+  addRowButton.addEventListener("click", addEntryRow);
+  cancelButton.addEventListener("click", () => dialog.close());
 
-  window.addEventListener("keydown", (event) => {
-    if (dialog.open || lightbox.open) return;
-    const activeTag = document.activeElement?.tagName;
-    if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-
-    const isDesktop = window.matchMedia("(min-width: 992px)").matches;
-    const scroller = document.querySelector(isDesktop ? ".computer" : ".phone");
-    if (!scroller) return;
-
-    const delta = event.key === "ArrowRight" ? window.innerWidth : -window.innerWidth;
-    scroller.scrollBy({ left: delta, behavior: "smooth" });
+  signOutButton.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    currentUser = null;
+    syncAuthUI();
+    dialog.close();
   });
 
-  for (const contentsList of [list, computerList]) {
-    contentsList.addEventListener("click", async (event) => {
-      const button = event.target.closest("[data-remove-id]");
-      if (!button || !currentUser) return;
-      const id = button.dataset.removeId;
-      if (!id || !window.confirm("Remove this title and its section?")) return;
-      button.disabled = true;
+  async function handleListClick(event) {
+    const button = event.target?.closest("[data-remove-id]");
+    if (!button || !currentUser) return;
+    const id = button.dataset.removeId;
+    if (!id) return;
 
-      const { data: projectImages } = await supabase
-        .from(imagesTable)
-        .select("storage_path")
-        .eq("project_id", id);
-
-      if (Array.isArray(projectImages) && projectImages.length) {
-        const paths = projectImages.map((img) => img.storage_path).filter(Boolean);
-        if (paths.length) {
-          await supabase.storage.from(mediaBucket).remove(paths);
+    if (button.dataset.confirming !== "true") {
+      button.dataset.confirming = "true";
+      button.textContent = "Confirm?";
+      window.setTimeout(() => {
+        if (button.isConnected && button.dataset.confirming === "true") {
+          button.dataset.confirming = "false";
+          button.textContent = "Remove";
         }
+      }, 3000);
+      return;
+    }
+
+    button.disabled = true;
+
+    const { data: projectImages } = await supabase
+      .from(imagesTable)
+      .select("storage_path")
+      .eq("project_id", id);
+
+    if (Array.isArray(projectImages) && projectImages.length) {
+      const paths = projectImages.map((img) => img.storage_path).filter(Boolean);
+      if (paths.length) {
+        await supabase.storage.from(mediaBucket).remove(paths);
       }
+    }
 
-      const { error: deleteError } = await supabase
-        .from(contentsTable)
-        .delete()
-        .eq("id", id);
+    const { error: deleteError } = await supabase
+      .from(contentsTable)
+      .delete()
+      .eq("id", id);
 
-      if (deleteError) {
-        button.disabled = false;
-        showStatus(`Could not remove the title: ${deleteError.message}`);
-        return;
-      }
+    if (deleteError) {
+      button.disabled = false;
+      button.dataset.confirming = "false";
+      button.textContent = "Remove";
+      showStatus(`Could not remove the title: ${deleteError.message}`);
+      return;
+    }
 
-      await renderEntries();
-    });
+    await renderEntries();
   }
+
+  list.addEventListener("click", handleListClick);
+  computerList.addEventListener("click", handleListClick);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -732,10 +728,10 @@
           dialog.close();
         } else {
           showEntryForm();
-          entryList.querySelector('[data-field="title"]').focus();
+          entryList.querySelector('[data-field="title"]')?.focus();
         }
       } catch (err) {
-        showError(`Could not sign in: ${err.message}`);
+        showError(`Could not sign in: ${err instanceof Error ? err.message : String(err)}`);
       }
       return;
     }
@@ -763,13 +759,37 @@
         return;
       }
     } catch (err) {
-      showError(`Could not save entries: ${err.message}`);
+      showError(`Could not save entries: ${err instanceof Error ? err.message : String(err)}`);
       return;
     }
 
     if (await renderEntries()) {
       dialog.close();
     }
+  });
+
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightboxImage.addEventListener("click", () => {
+    lightboxImage.classList.toggle("is-zoomed");
+  });
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox) {
+      closeLightbox();
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (dialog.open || lightbox.open) return;
+    const activeTag = document.activeElement?.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+    const isDesktop = window.matchMedia("(min-width: 992px)").matches;
+    const scroller = document.querySelector(isDesktop ? ".computer" : ".phone");
+    if (!scroller) return;
+
+    const delta = event.key === "ArrowRight" ? window.innerWidth : -window.innerWidth;
+    scroller.scrollBy({ left: delta, behavior: "smooth" });
   });
 
   supabase.auth.onAuthStateChange((_event, session) => {

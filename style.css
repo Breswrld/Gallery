@@ -276,7 +276,7 @@ html {
 
 @media (min-width: 992px) {
   :root {
-    --computer-banner-height: clamp(110px, 17vh, 156px);
+    --computer-banner-height: clamp(82px, 13vh, 128px);
   }
 
   html {
@@ -335,11 +335,47 @@ html {
 
   .computer__banner .computer__banner-top {
     z-index: 1;
-    -webkit-mask-image: linear-gradient(to bottom, #000 0 44%, transparent 56% 100%);
-    -webkit-mask-size: 100% 200%;
-    mask-image: linear-gradient(to bottom, #000 0 44%, transparent 56% 100%);
-    mask-size: 100% 200%;
-    animation: tablet-banner-wipe 16s linear infinite reverse;
+    -webkit-mask-image: linear-gradient(to right, #000 0 45%, transparent 55% 100%);
+    -webkit-mask-position: 0 0;
+    -webkit-mask-size: 250% 100%;
+    mask-image: linear-gradient(to right, #000 0 45%, transparent 55% 100%);
+    mask-position: 0 0;
+    mask-size: 250% 100%;
+    animation: computer-banner-wipe 16s linear infinite;
+  }
+
+  @keyframes computer-banner-wipe {
+    0% {
+      -webkit-mask-position: 0 0;
+      mask-position: 0 0;
+    }
+    18.75%, 81.25% {
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+    100% {
+      -webkit-mask-position: 0 0;
+      mask-position: 0 0;
+    }
+  }
+
+  @supports not (mask-image: linear-gradient(to right, #000, transparent)) {
+    .computer__banner .computer__banner-top {
+      clip-path: inset(0);
+      animation-name: computer-banner-clip-wipe;
+    }
+
+    @keyframes computer-banner-clip-wipe {
+      0% {
+        clip-path: inset(0);
+      }
+      18.75%, 81.25% {
+        clip-path: inset(0 0 0 100%);
+      }
+      100% {
+        clip-path: inset(0);
+      }
+    }
   }
 
   .computer__home {
@@ -348,25 +384,25 @@ html {
     display: grid;
     width: 100vw;
     height: 100svh;
-    overflow-y: auto;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+    overflow: hidden;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
     align-items: center;
-    gap: clamp(32px, 7vw, 100px);
-    padding: calc(var(--computer-banner-height) + 32px) clamp(36px, 7vw, 112px) 48px;
+    gap: clamp(24px, 5vw, 80px);
+    padding: calc(var(--computer-banner-height) + clamp(16px, 2.5vh, 28px)) clamp(32px, 6vw, 96px) clamp(16px, 3vh, 32px);
     scroll-snap-align: start;
   }
 
   .computer__intro h1 {
     max-width: 16ch;
     margin: 0;
-    font-size: clamp(2.2rem, 4vw, 4rem);
+    font-size: clamp(1.85rem, min(3.6vw, 5.4vh), 3.4rem);
     font-weight: 400;
     line-height: 0.98;
     letter-spacing: -0.045em;
   }
 
   .computer__eyebrow {
-    margin: 0 0 16px;
+    margin: 0 0 clamp(8px, 1.4vh, 14px);
     color: #0879c9;
     font: 0.8rem Arial, sans-serif;
     letter-spacing: 0.14em;
@@ -375,18 +411,20 @@ html {
 
   .computer__intro > p:last-child {
     max-width: 55ch;
-    margin: 22px 0 0;
+    margin: clamp(12px, 2vh, 20px) 0 0;
     color: #756a5d;
-    font: 1rem/1.6 Arial, sans-serif;
+    font: clamp(0.88rem, min(1.2vw, 2vh), 1rem)/1.5 Arial, sans-serif;
   }
 
   .computer__contents {
     width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
   }
 
   .computer__contents h2 {
-    margin: 0 0 24px;
-    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    margin: 0 0 clamp(12px, 2vh, 20px);
+    font-size: clamp(1.45rem, min(2.6vw, 3.8vh), 2.25rem);
     font-weight: 400;
   }
 
@@ -398,7 +436,7 @@ html {
 
   .computer__contents th,
   .computer__contents td {
-    padding: 12px 10px;
+    padding: clamp(7px, 1.1vh, 11px) 10px;
     border: 1px solid #342d25;
   }
 
@@ -413,7 +451,8 @@ html {
   }
 
   .computer__contents > .contents__edit {
-    margin-top: 20px;
+    margin-top: clamp(12px, 2vh, 18px);
+    padding: 9px 18px;
   }
 
   #computer-dynamic-sections {
@@ -425,7 +464,7 @@ html {
     display: grid;
     width: 100vw;
     height: 100svh;
-    overflow-y: auto;
+    overflow: hidden;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
     scroll-snap-align: start;
@@ -434,10 +473,12 @@ html {
 
   .computer__project-gallery {
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    gap: 12px;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 10px;
     min-width: 0;
-    padding: 24px clamp(24px, 5vw, 64px);
+    min-height: 0;
+    height: 100%;
+    padding: clamp(16px, 2.5vh, 24px) clamp(24px, 4vw, 56px);
     background: #e8f2f8;
   }
 
@@ -485,7 +526,7 @@ html {
     position: relative;
     justify-self: start;
     display: inline-flex;
-    min-height: 42px;
+    min-height: 40px;
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
@@ -493,7 +534,7 @@ html {
     border-radius: 4px;
     background: transparent;
     color: #075e9b;
-    font: 1rem Arial, sans-serif;
+    font: 0.95rem Arial, sans-serif;
     cursor: pointer;
   }
 
@@ -517,9 +558,10 @@ html {
 
   .computer__project-grid {
     display: grid;
-    min-height: 220px;
+    min-height: 0;
+    overflow-y: auto;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: clamp(92px, 11vw, 140px);
+    grid-auto-rows: clamp(76px, min(9.5vw, 15vh), 128px);
     grid-auto-flow: dense;
     align-content: start;
     gap: 8px;
@@ -570,9 +612,11 @@ html {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 18px;
+    gap: 16px;
     min-width: 0;
-    padding: 36px clamp(36px, 8vw, 120px);
+    min-height: 0;
+    overflow-y: auto;
+    padding: clamp(20px, 4vh, 36px) clamp(28px, 6vw, 96px);
   }
 
   .computer__project-title {
@@ -583,7 +627,7 @@ html {
     border-bottom: 1px solid transparent;
     background: transparent;
     color: #342d25;
-    font: 400 clamp(2rem, 4vw, 3.2rem)/1 Georgia, "Times New Roman", serif;
+    font: 400 clamp(1.75rem, min(3.4vw, 4.8vh), 3rem)/1 Georgia, "Times New Roman", serif;
     letter-spacing: -0.045em;
   }
 
@@ -596,7 +640,7 @@ html {
     border-bottom: 1px solid transparent;
     background: transparent;
     color: #756a5d;
-    font: 1rem/1.55 Arial, sans-serif;
+    font: clamp(0.9rem, 1.8vh, 1rem)/1.5 Arial, sans-serif;
   }
 
   .computer__project-title:not([readonly]):focus,
