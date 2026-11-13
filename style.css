@@ -535,7 +535,7 @@ html {
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: url("images/dots.jpg") top center / 100% auto repeat-y;
+    background: url("images/light_grey_dots_background.jpg") top center / 100% auto repeat-y;
     -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 108px), rgba(0, 0, 0, 0.35) calc(100% - 44px), transparent 100%);
     mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 108px), rgba(0, 0, 0, 0.35) calc(100% - 44px), transparent 100%);
   }
@@ -1127,7 +1127,7 @@ html {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: url("images/dots.jpg") top center / 100% auto repeat-y;
+  background: url("images/light_grey_dots_background.jpg") top center / 100% auto repeat-y;
   -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 88px), rgba(0, 0, 0, 0.35) calc(100% - 36px), transparent 100%);
   mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 88px), rgba(0, 0, 0, 0.35) calc(100% - 36px), transparent 100%);
 }
