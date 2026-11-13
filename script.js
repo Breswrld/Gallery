@@ -1,6 +1,4 @@
-
-
-document.addEventListener("DOMContentLoaded", () => {
+function startGallery() {
   const contentsTable = "table_of_contents";
   const imagesTable = "project_images";
   const mediaBucket = "project-media";
@@ -35,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxCaption = document.getElementById("lightbox-caption");
   const lightboxClose = document.getElementById("lightbox-close");
 
+  let supabase = null;
   let currentUser = null;
   let closeAfterSignIn = false;
 
@@ -50,6 +49,17 @@ document.addEventListener("DOMContentLoaded", () => {
     status.hidden = true;
     computerStatus.textContent = "";
     computerStatus.hidden = true;
+  }
+
+  async function ensureSupabaseClient() {
+    if (supabase) return supabase;
+    if (window.supabase && typeof window.supabase.createClient === "function") {
+      supabase = window.supabase.createClient(supabaseUrl, supabasePublishableKey);
+      return supabase;
+    }
+    const mod = await import("https://esm.sh/@supabase/supabase-js@2");
+    supabase = mod.createClient(supabaseUrl, supabasePublishableKey);
+    return supabase;
   }
 
   function createArrowIcon(direction) {
@@ -96,8 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     nav.append(backLink, steps);
     return nav;
   }
-
-  const supabase = window.supabase.createClient(supabaseUrl, supabasePublishableKey);
 
   function showError(message) {
     error.textContent = message;
@@ -165,9 +173,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     removeButton.addEventListener("click", async () => {
       if (!currentUser) return;
+      const client = await ensureSupabaseClient();
       removeButton.disabled = true;
 
-      const { error: dbError } = await supabase
+      const { error: dbError } = await client
         .from(imagesTable)
         .delete()
         .eq("id", imgRecord.id);
@@ -180,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (imgRecord.storage_path) {
-        await supabase.storage.from(mediaBucket).remove([imgRecord.storage_path]);
+        await client.storage.from(mediaBucket).remove([imgRecord.storage_path]);
       }
 
       for (const el of document.querySelectorAll(`[data-project-id="${projectId}"] [data-image-id="${imgRecord.id}"]`)) {
@@ -194,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function handlePhotoUpload(files, entry, messageEl) {
     if (!currentUser) return;
+    const client = await ensureSupabaseClient();
     const validFiles = files.filter((file) => file.type.startsWith("image/"));
     const hasInvalid = validFiles.length !== files.length;
 
@@ -211,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const storagePath = `${entry.id}/${uniquePart}-${safeName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await client.storage
         .from(mediaBucket)
         .upload(storagePath, file, { upsert: false });
 
@@ -220,11 +230,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const { data: publicData } = supabase.storage
+      const { data: publicData } = client.storage
         .from(mediaBucket)
         .getPublicUrl(storagePath);
 
-      const { data: insertedRow, error: insertError } = await supabase
+      const { data: insertedRow, error: insertError } = await client
         .from(imagesTable)
         .insert({
           project_id: entry.id,
@@ -236,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .single();
 
       if (insertError || !insertedRow) {
-        await supabase.storage.from(mediaBucket).remove([storagePath]);
+        await client.storage.from(mediaBucket).remove([storagePath]);
         messageEl.textContent = `Could not save photo record: ${insertError?.message ?? "Unknown error"}`;
         return;
       }
@@ -267,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function saveProjectText(entry, titleInput, descInput, saveBtn, saveStatusEl) {
     if (!currentUser) return;
+    const client = await ensureSupabaseClient();
     const nextTitle = titleInput.value.trim();
     const nextDescription = descInput.value;
 
@@ -279,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBtn.disabled = true;
     saveStatusEl.textContent = "Saving...";
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await client
       .from(contentsTable)
       .update({
         title: nextTitle,
@@ -438,13 +449,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let entriesResult;
     let imagesResult;
     try {
+      const client = await ensureSupabaseClient();
       [entriesResult, imagesResult] = await Promise.all([
-        supabase
+        client
           .from(contentsTable)
           .select("id, title, description")
           .order("created_at", { ascending: true })
           .order("id", { ascending: true }),
-        supabase
+        client
           .from(imagesTable)
           .select("id, project_id, storage_path, url, file_name")
           .order("created_at", { ascending: true })
@@ -662,7 +674,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleCancel = () => dialog.close();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const client = await ensureSupabaseClient();
+    await client.auth.signOut();
     currentUser = null;
     syncAuthUI();
     dialog.close();
@@ -686,9 +699,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const client = await ensureSupabaseClient();
     button.disabled = true;
 
-    const { data: projectImages } = await supabase
+    const { data: projectImages } = await client
       .from(imagesTable)
       .select("storage_path")
       .eq("project_id", id);
@@ -696,11 +710,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Array.isArray(projectImages) && projectImages.length) {
       const paths = projectImages.map((img) => img.storage_path).filter(Boolean);
       if (paths.length) {
-        await supabase.storage.from(mediaBucket).remove(paths);
+        await client.storage.from(mediaBucket).remove(paths);
       }
     }
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await client
       .from(contentsTable)
       .delete()
       .eq("id", id);
@@ -719,10 +733,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     error.textContent = "";
+    const client = await ensureSupabaseClient();
 
     if (!currentUser) {
       try {
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        const { data, error: signInError } = await client.auth.signInWithPassword({
           email: emailInput.value.trim(),
           password: passwordInput.value
         });
@@ -762,7 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const { error: insertError } = await supabase.from(contentsTable).insert(newEntries);
+      const { error: insertError } = await client.from(contentsTable).insert(newEntries);
       if (insertError) {
         showError(`Could not save entries: ${insertError.message}`);
         return;
@@ -794,6 +809,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  const handleAnchorClick = (event) => {
+    const anchor = event.target?.closest('a[href^="#"]');
+    if (!anchor) return;
+    const hash = anchor.getAttribute("href");
+    if (!hash || hash === "#") return;
+    const destination = document.getElementById(hash.slice(1));
+    if (!destination) return;
+    const scroller = destination.closest(".computer, .phone");
+    if (!scroller) return;
+
+    event.preventDefault();
+    const targetLeft = scroller.scrollLeft + (destination.getBoundingClientRect().left - scroller.getBoundingClientRect().left);
+    scroller.scrollTo({ left: targetLeft, behavior: "smooth" });
+    if (window.location.hash !== hash) {
+      history.replaceState(null, "", hash);
+    }
+  };
+
   const handleKeyDown = (event) => {
     if (dialog.open || lightbox.open) return;
     const activeTag = document.activeElement?.tagName;
@@ -819,16 +852,18 @@ document.addEventListener("DOMContentLoaded", () => {
   lightboxClose.addEventListener("click", closeLightbox);
   lightboxImage.addEventListener("click", handleLightboxImageClick);
   lightbox.addEventListener("click", handleLightboxBackdropClick);
+  document.addEventListener("click", handleAnchorClick);
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("resize", autoSizeAllDescriptions);
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user ?? null;
-    syncAuthUI();
-  });
-
   async function initialize() {
-    const { data, error: sessionError } = await supabase.auth.getSession();
+    const client = await ensureSupabaseClient();
+    client.auth.onAuthStateChange((_event, session) => {
+      currentUser = session?.user ?? null;
+      syncAuthUI();
+    });
+
+    const { data, error: sessionError } = await client.auth.getSession();
     if (sessionError) {
       showStatus(`Could not check sign-in status: ${sessionError.message}`);
     } else {
@@ -840,4 +875,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initialize().catch((err) => {
     showStatus(`Could not connect to Supabase: ${err instanceof Error ? err.message : String(err)}`);
   });
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startGallery);
+} else {
+  startGallery();
+}
