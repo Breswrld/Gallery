@@ -1,5 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 document.addEventListener("DOMContentLoaded", () => {
   const contentsTable = "table_of_contents";
   const imagesTable = "project_images";
