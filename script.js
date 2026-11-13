@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const contentsTable = "table_of_contents";
   const imagesTable = "project_images";
@@ -95,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return nav;
   }
 
-  const supabase = createClient(supabaseUrl, supabasePublishableKey);
+  const supabase = window.supabase.createClient(supabaseUrl, supabasePublishableKey);
 
   function showError(message) {
     error.textContent = message;
@@ -752,7 +754,6 @@ document.addEventListener("DOMContentLoaded", () => {
         titleInput.focus();
         return;
       }
-      // Kept href: "" since your table has an href column
       newEntries.push({
         title,
         href: "",
