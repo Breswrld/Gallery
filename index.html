@@ -4,23 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Digital Imaging II Gallery</title>
-  <link rel="stylesheet" href="style.css?v=23">
+  <meta name="description" content="Horizontal editorial portfolio gallery for Digital Imaging II: Adobe Photoshop.">
+  <meta property="og:title" content="Digital Imaging II Gallery">
+  <meta property="og:description" content="Horizontal editorial portfolio gallery for Digital Imaging II: Adobe Photoshop.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://jrmsbpfkxhtcnhdvplmh.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&display=swap">
+  <link rel="stylesheet" href="style.css?v=24">
   <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
   <link rel="shortcut icon" href="favicon/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="Gallery" />
   <link rel="manifest" href="favicon/site.webmanifest" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=23" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="script.js?v=24" defer></script>
 </head>
 <body>
   <main class="horizontal-sections">
     <section class="phone" aria-label="Phone gallery">
       <section class="gallery" id="intro-section" aria-label="Introduction">
         <div class="tbanner" id="banner" role="img" aria-label="Two floral sidewall images alternating with a slow wipe">
-          <img class="tbanner-image" src="images/sidewall.jpg" alt="">
-          <img class="tbanner-image tbanner-image-top" src="images/sidewall2.jpg" alt="">
+          <img class="tbanner-image" src="images/sidewall.webp" alt="" fetchpriority="high" decoding="async">
+          <img class="tbanner-image tbanner-image-top" src="images/sidewall2.webp" alt="" decoding="async">
         </div>
         <section class="intro">
           <h1 class="intro__title">Welcome to Digital Imaging II: Adobe Photoshop</h1>
@@ -67,7 +75,7 @@
           <p>For this project, I focused on pushing the limits of digital collage and image manipulation in Photoshop by carefully integrating custom elements, precise masking, and advanced blending techniques. My goal was to create a seamless, cohesive composition that transforms the original source material into something entirely new, paying close attention to lighting, scale, and texture to ensure the illusion remains completely believable.</p>
         </div>
         <div class="computer__contents-bg">
-          <img class="computer__contents-bg-image" src="images/art.jpg" alt="" aria-hidden="true">
+          <img class="computer__contents-bg-image" src="images/art.webp" alt="" aria-hidden="true" decoding="async">
           <nav class="computer__contents" aria-labelledby="computer-contents-title">
             <h2 id="computer-contents-title">Table of Contents</h2>
             <div class="computer__contents-scroll">
@@ -81,7 +89,9 @@
               </table>
             </div>
             <p class="contents__status" id="computer-contents-status" role="status" aria-live="polite" hidden></p>
-            <button class="contents__edit" id="computer-contents-edit" type="button">+ Add title</button>
+            <button class="contents__edit" id="computer-contents-edit" type="button">
+              + Add title
+            </button>
           </nav>
         </div>
       </section>
